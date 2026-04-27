@@ -13,131 +13,253 @@ class DashboardScreen extends ConsumerWidget {
     final userProfile = ref.watch(userProfileProvider).valueOrNull;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            expandedHeight: 180.0,
-            floating: false,
-            pinned: true,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
+      backgroundColor: AppColors.vertBg,
+      body: Column(
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
+            decoration: const BoxDecoration(
+              color: AppColors.vertForet,
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -30,
+                  right: -20,
+                  child: Container(
+                    width: 140,
+                    height: 140,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.05),
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Bonjour, ${userProfile?.prenom ?? "Parent"} 👋',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'BONJOUR 👋',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColors.vertClair,
+                                letterSpacing: 1.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '${userProfile?.prenom ?? "Parent"} ${userProfile?.nom ?? ""}',
+                              style: const TextStyle(
+                                fontFamily: 'Playfair Display',
+                                fontSize: 22,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
+                        Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              const Icon(Icons.notifications_none, color: Colors.white, size: 20),
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.ocre,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.vertForet, width: 1.5),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 18),
+                    // Baby Card
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.13),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.white.withOpacity(0.12)),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Suivez la santé de ${userProfile?.nomEnfant ?? "votre enfant"} en toute sérénité.',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: const BoxDecoration(
+                              color: AppColors.ocreClair,
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Text('👶', style: TextStyle(fontSize: 18)),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  userProfile?.nomEnfant ?? "Mon enfant",
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                                const Text(
+                                  '4 mois · 5.2 kg · 58 cm',
+                                  style: TextStyle(color: AppColors.vertClair, fontSize: 11),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.ocre,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text(
+                              'ACTIF',
+                              style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '⚠️ ALERTE DU JOUR',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: AppColors.grisTexte,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.ocreClair, Color(0xFFFFF8EC)],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: const Border(left: BorderSide(color: AppColors.ocre, width: 4)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Text('💉', style: TextStyle(fontSize: 24)),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Vaccin DTC dans 2 jours',
+                                style: TextStyle(color: AppColors.terracotta, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              Text(
+                                'Centre de santé Gbégamey · 09h00',
+                                style: TextStyle(color: AppColors.grisTexte, fontSize: 11),
+                              ),
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'MES MODULES',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: AppColors.grisTexte,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: 1.4,
+                    children: [
+                      _buildModule(
+                        'Carnet Santé',
+                        'Vaccins & docs',
+                        '📋',
+                        AppColors.vertPastel,
+                        () => context.push(AppRoutes.carnet),
+                      ),
+                      _buildModule(
+                        'Pleurs IA',
+                        'Analyser',
+                        '🔊',
+                        AppColors.ocreClair,
+                        () => context.push(AppRoutes.pleurs),
+                      ),
+                      _buildModule(
+                        'Toise AR',
+                        'Mesurer',
+                        '📏',
+                        AppColors.peche,
+                        () => context.push(AppRoutes.toise),
+                      ),
+                      _buildModule(
+                        'Géo-Santé',
+                        'Centres proches',
+                        '🗺️',
+                        const Color(0xFFDCF0FF),
+                        () => context.push(AppRoutes.hopitaux),
+                      ),
+                      _buildModule(
+                        'Encyclopédie',
+                        'Conseils',
+                        '📚',
+                        const Color(0xFFE8F5E9),
+                        () => context.push(AppRoutes.encyclopedie),
+                      ),
+                      _buildModule(
+                        'Nutrition',
+                        'Alimentation',
+                        '🍽️',
+                        AppColors.peche,
+                        () => context.push(AppRoutes.nutrition),
                       ),
                     ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(20),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: 1.1,
-              ),
-              delegate: SliverChildListDelegate([
-                _DashboardCard(
-                  title: 'Carnet de santé',
-                  icon: Icons.menu_book_rounded,
-                  color: Colors.blue.shade100,
-                  iconColor: Colors.blue.shade700,
-                  onTap: () => context.push(AppRoutes.carnet),
-                ),
-                _DashboardCard(
-                  title: 'Analyse Pleurs',
-                  icon: Icons.mic_rounded,
-                  color: Colors.purple.shade100,
-                  iconColor: Colors.purple.shade700,
-                  onTap: () => context.push(AppRoutes.pleurs),
-                ),
-                _DashboardCard(
-                  title: 'Mesure Taille',
-                  icon: Icons.straighten_rounded,
-                  color: Colors.orange.shade100,
-                  iconColor: Colors.orange.shade700,
-                  onTap: () => context.push(AppRoutes.toise),
-                ),
-                _DashboardCard(
-                  title: 'Hôpitaux',
-                  icon: Icons.local_hospital_rounded,
-                  color: Colors.red.shade100,
-                  iconColor: Colors.red.shade700,
-                  onTap: () => context.push(AppRoutes.hopitaux),
-                ),
-                _DashboardCard(
-                  title: 'Encyclopédie',
-                  icon: Icons.library_books_rounded,
-                  color: Colors.green.shade100,
-                  iconColor: Colors.green.shade700,
-                  onTap: () => context.push(AppRoutes.encyclopedie),
-                ),
-                _DashboardCard(
-                  title: 'Nutrition',
-                  icon: Icons.restaurant_rounded,
-                  color: Colors.teal.shade100,
-                  iconColor: Colors.teal.shade700,
-                  onTap: () => context.push(AppRoutes.nutrition),
-                ),
-              ]),
-            ),
-          ),
-          const SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-              child: Text(
-                'Conseils du jour',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              height: 120,
-              margin: const EdgeInsets.only(bottom: 20),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: [
-                  _TipCard(
-                    text: 'Sommeil : Comment aider bébé à faire ses nuits ?',
-                    color: Colors.indigo.shade50,
-                  ),
-                  _TipCard(
-                    text: 'Diversification : Les premiers légumes à introduire.',
-                    color: Colors.green.shade50,
                   ),
                 ],
               ),
@@ -147,99 +269,35 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
-}
 
-class _DashboardCard extends StatelessWidget {
-  final String title;
-  final IconData icon;
-  final Color color;
-  final Color iconColor;
-  final VoidCallback onTap;
-
-  const _DashboardCard({
-    required this.title,
-    required this.icon,
-    required this.color,
-    required this.iconColor,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
+  Widget _buildModule(String title, String sub, String icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
       child: Container(
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
+            BoxShadow(color: AppColors.vertForet.withOpacity(0.06), blurRadius: 10, offset: const Offset(0, 2)),
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: iconColor, size: 30),
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(10)),
+              alignment: Alignment.center,
+              child: Text(icon, style: const TextStyle(fontSize: 16)),
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
+            const SizedBox(height: 8),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(sub, style: const TextStyle(color: AppColors.grisTexte, fontSize: 10)),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _TipCard extends StatelessWidget {
-  final String text;
-  final Color color;
-
-  const _TipCard({required this.text, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      margin: const EdgeInsets.only(right: 15),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: AppColors.textSecondary),
-        ],
       ),
     );
   }

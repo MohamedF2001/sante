@@ -1,11 +1,10 @@
-// ============================================================
-// lib/features/auth/presentation/screens/register_screen.dart
-// Écran d'inscription — correspond à l'Écran 5 du design
-// ============================================================
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sante_famille/core/constants/app_colors.dart';
+import 'package:sante_famille/core/constants/app_routes.dart';
+import 'package:sante_famille/core/widgets/custom_button.dart';
+import 'package:sante_famille/core/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -17,39 +16,33 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-
-  // Contrôleurs pour chaque champ
   final _prenomCtrl = TextEditingController();
   final _nomCtrl = TextEditingController();
-  final _telephoneCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
-  final _nomEnfantCtrl = TextEditingController();
-  bool _passwordVisible = false;
+  final _passCtrl = TextEditingController();
+  final _enfantCtrl = TextEditingController();
 
   @override
   void dispose() {
-    // Libérer la mémoire des contrôleurs
     _prenomCtrl.dispose();
     _nomCtrl.dispose();
-    _telephoneCtrl.dispose();
+    _phoneCtrl.dispose();
     _emailCtrl.dispose();
-    _passwordCtrl.dispose();
-    _nomEnfantCtrl.dispose();
+    _passCtrl.dispose();
+    _enfantCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
-    // Valider le formulaire avant de soumettre
     if (!_formKey.currentState!.validate()) return;
-
     await ref.read(authNotifierProvider.notifier).register(
       email: _emailCtrl.text.trim(),
-      password: _passwordCtrl.text.trim(),
+      password: _passCtrl.text.trim(),
       nom: _nomCtrl.text.trim(),
       prenom: _prenomCtrl.text.trim(),
-      telephone: _telephoneCtrl.text.trim(),
-      nomEnfant: _nomEnfantCtrl.text.trim(),
+      telephone: _phoneCtrl.text.trim(),
+      nomEnfant: _enfantCtrl.text.trim(),
     );
   }
 
@@ -57,183 +50,163 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
 
-    // Écouter les changements d'état
     ref.listen<AuthState>(authNotifierProvider, (prev, next) {
       if (next.status == AuthStatus.success) {
-        // Rediriger vers le dashboard
-        Navigator.of(context).pushReplacementNamed('/dashboard');
+        context.go(AppRoutes.dashboard);
       } else if (next.status == AuthStatus.error) {
-        // Afficher l'erreur
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage ?? 'Erreur inconnue'),
-            backgroundColor: AppColors.danger,
-          ),
+          SnackBar(content: Text(next.errorMessage ?? 'Erreur'), backgroundColor: AppColors.terracotta),
         );
       }
     });
 
     return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ─── Header vert ──────────────────────────────
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
+      backgroundColor: AppColors.vertBg,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(18, 50, 18, 36),
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: AppColors.vertForet,
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -30,
+                  right: -20,
+                  child: Container(
+                    width: 130,
+                    height: 130,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.06),
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
-                child: Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Bouton retour
                     GestureDetector(
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => context.go(AppRoutes.login),
                       child: const Row(
-                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.arrow_back, color: Colors.white70, size: 18),
+                          Icon(Icons.arrow_back, color: Colors.white60, size: 16),
                           SizedBox(width: 4),
-                          Text('Retour',
-                              style: TextStyle(color: Colors.white70, fontSize: 14)),
+                          Text('Retour', style: TextStyle(color: Colors.white60, fontSize: 12)),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 14),
                     const Text(
                       'Créer un compte',
                       style: TextStyle(
+                        fontFamily: 'Playfair Display',
+                        fontSize: 26,
                         color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 6),
                     const Text(
                       'Rejoignez Santé Famille gratuitement',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.vertClair,
+                        fontWeight: FontWeight.w300,
+                      ),
                     ),
                   ],
                 ),
-              ),
-
-              // ─── Formulaire ───────────────────────────────
-              Padding(
-                padding: const EdgeInsets.all(24),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(18),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.vertForet.withOpacity(0.1),
+                      blurRadius: 32,
+                    ),
+                  ],
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Prénom + Nom (côte à côte)
                       Row(
                         children: [
                           Expanded(
-                            child: _buildField(
-                              label: 'PRÉNOM',
+                            child: CustomTextField(
+                              label: 'Prénom',
                               controller: _prenomCtrl,
+                              prefixIcon: Icons.person_outline,
                               hint: 'Aicha',
-                              icon: Icons.person_outline,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
-                            child: _buildField(
-                              label: 'NOM',
+                            child: CustomTextField(
+                              label: 'Nom',
                               controller: _nomCtrl,
                               hint: 'Traoré',
-                              icon: Icons.person_outline,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-
-                      // Téléphone
-                      _buildField(
-                        label: 'TÉLÉPHONE',
-                        controller: _telephoneCtrl,
+                      const SizedBox(height: 14),
+                      CustomTextField(
+                        label: 'Nom de l\'enfant',
+                        controller: _enfantCtrl,
+                        prefixIcon: Icons.child_care,
+                        hint: 'Petit Ibrahim',
+                      ),
+                      const SizedBox(height: 14),
+                      CustomTextField(
+                        label: 'Téléphone',
+                        controller: _phoneCtrl,
+                        prefixIcon: Icons.phone_android,
                         hint: '+229 97 00 00 00',
-                        icon: Icons.phone_outlined,
-                        type: TextInputType.phone,
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? 'Champ requis'
-                            : null,
                       ),
-                      const SizedBox(height: 16),
-
-                      // Email
-                      _buildField(
-                        label: 'EMAIL',
+                      const SizedBox(height: 14),
+                      CustomTextField(
+                        label: 'Email',
                         controller: _emailCtrl,
+                        prefixIcon: Icons.email_outlined,
                         hint: 'aicha@email.com',
-                        icon: Icons.email_outlined,
-                        type: TextInputType.emailAddress,
-                        validator: (v) {
-                          if (v == null || v.isEmpty) return 'Champ requis';
-                          if (!v.contains('@')) return 'Email invalide';
-                          return null;
-                        },
                       ),
-                      const SizedBox(height: 16),
-
-                      // Mot de passe
-                      _PasswordField(controller: _passwordCtrl),
-                      const SizedBox(height: 16),
-
-                      // Nom de l'enfant
-                      _buildField(
-                        label: 'NOM DE L\'ENFANT',
-                        controller: _nomEnfantCtrl,
-                        hint: 'Ibrahim',
-                        icon: Icons.child_care,
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? 'Champ requis'
-                            : null,
+                      const SizedBox(height: 14),
+                      CustomTextField(
+                        label: 'Mot de passe',
+                        controller: _passCtrl,
+                        prefixIcon: Icons.lock_outline,
+                        obscureText: true,
+                        hint: '••••••••',
                       ),
-                      const SizedBox(height: 32),
-
-                      // Bouton inscription
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: authState.status == AuthStatus.loading
-                              ? null
-                              : _submit,
-                          child: authState.status == AuthStatus.loading
-                              ? const CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2)
-                              : const Text('Créer mon compte →'),
-                        ),
+                      const SizedBox(height: 24),
+                      CustomButton(
+                        label: 'Créer mon compte →',
+                        onPressed: _submit,
+                        isLoading: authState.status == AuthStatus.loading,
                       ),
-                      const SizedBox(height: 16),
-
-                      // Lien vers connexion
+                      const SizedBox(height: 14),
                       Center(
                         child: GestureDetector(
-                          onTap: () => Navigator.pushReplacementNamed(
-                              context, '/login'),
+                          onTap: () => context.go(AppRoutes.login),
                           child: RichText(
                             text: const TextSpan(
                               text: 'Déjà un compte ? ',
-                              style: TextStyle(
-                                  color: AppColors.textSecondary, fontSize: 14),
+                              style: TextStyle(color: AppColors.grisTexte, fontSize: 12),
                               children: [
                                 TextSpan(
                                   text: 'Se connecter',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(color: AppColors.vertForet, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -244,94 +217,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
-
-  // Widget helper pour créer un champ de formulaire
-  Widget _buildField({
-    required String label,
-    required TextEditingController controller,
-    String? hint,
-    IconData? icon,
-    TextInputType type = TextInputType.text,
-    String? Function(String?)? validator,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-                color: AppColors.textSecondary)),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: controller,
-          keyboardType: type,
-          validator: validator ?? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null,
-          decoration: InputDecoration(
-            hintText: hint,
-            prefixIcon: icon != null
-                ? Icon(icon, size: 18, color: AppColors.textLight)
-                : null,
-          ),
-        ),
-      ],
-    );
-  }
 }
-
-// Widget séparé pour le champ mot de passe (toggle visibility)
-class _PasswordField extends StatefulWidget {
-  final TextEditingController controller;
-  const _PasswordField({required this.controller});
-
-  @override
-  State<_PasswordField> createState() => _PasswordFieldState();
-}
-
-class _PasswordFieldState extends State<_PasswordField> {
-  bool _visible = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('MOT DE PASSE',
-            style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-                color: AppColors.textSecondary)),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: widget.controller,
-          obscureText: !_visible,
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Champ requis';
-            if (v.length < 6) return 'Minimum 6 caractères';
-            return null;
-          },
-          decoration: InputDecoration(
-            hintText: '••••••••',
-            prefixIcon:
-            const Icon(Icons.lock_outline, size: 18, color: AppColors.textLight),
-            suffixIcon: IconButton(
-              icon: Icon(_visible ? Icons.visibility : Icons.visibility_off,
-                  size: 18, color: AppColors.textLight),
-              onPressed: () => setState(() => _visible = !_visible),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-

@@ -11,16 +11,33 @@ class CarnetScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: AppColors.vertBg,
         appBar: AppBar(
-          title: const Text('Carnet de santé'),
+          backgroundColor: AppColors.vertForet,
+          elevation: 0,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Carnet Vaccinal',
+                style: TextStyle(fontFamily: 'Playfair Display', fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                'Ibrahim · Programme PEV Bénin',
+                style: TextStyle(fontSize: 12, color: AppColors.vertClair, fontWeight: FontWeight.w400),
+              ),
+            ],
+          ),
           bottom: const TabBar(
             tabs: [
-              Tab(text: 'Vaccins', icon: Icon(Icons.vaccines)),
-              Tab(text: 'Scans / Docs', icon: Icon(Icons.document_scanner)),
+              Tab(text: 'Vaccins'),
+              Tab(text: 'Scans / Docs'),
             ],
-            indicatorColor: Colors.white,
+            indicatorColor: AppColors.ocre,
+            indicatorWeight: 3,
             labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
+            unselectedLabelColor: AppColors.vertClair,
+            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
         ),
         body: const TabBarView(

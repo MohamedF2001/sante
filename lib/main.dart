@@ -7,6 +7,8 @@ import 'package:sante_famille/core/widgets/main_scaffold.dart';
 import 'package:sante_famille/features/auth/presentation/providers/auth_provider.dart';
 import 'package:sante_famille/features/auth/presentation/screens/login_screen.dart';
 import 'package:sante_famille/features/auth/presentation/screens/register_screen.dart';
+import 'package:sante_famille/features/onboarding/presentation/screens/splash_screen.dart';
+import 'package:sante_famille/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:sante_famille/features/dashboard/presentation/screens/dashboard_screen.dart';
 import 'package:sante_famille/features/pleurs/presentation/screens/pleurs_screen.dart';
 import 'package:sante_famille/features/toise/presentation/screens/toise_screen.dart';
@@ -18,6 +20,9 @@ import 'package:sante_famille/features/nutrition/presentation/screens/nutrition_
 import 'package:sante_famille/features/forum/presentation/screens/forum_screen.dart';
 import 'package:sante_famille/features/profil/presentation/screens/profil_screen.dart';
 import 'package:sante_famille/features/profil/presentation/screens/parametres_screen.dart';
+import 'package:sante_famille/features/profil/presentation/screens/courbe_croissance_screen.dart';
+import 'package:sante_famille/features/profil/presentation/screens/rdv_screen.dart';
+import 'package:sante_famille/features/core/presentation/screens/ussd_screen.dart';
 import 'package:sante_famille/core/constants/app_routes.dart';
 
 import 'firebase_options.dart';
@@ -38,16 +43,29 @@ final routerProvider = Provider<GoRouter>((ref) {
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.dashboard,
+    initialLocation: '/splash',
     redirect: (context, state) {
       final isLoggedIn = authState.valueOrNull != null;
-      final isLoggingIn = state.uri.path == AppRoutes.login || state.uri.path == AppRoutes.register;
+      final path = state.uri.path;
+
+      // Allow splash and onboarding without login
+      if (path == '/splash' || path == '/onboarding') return null;
+
+      final isLoggingIn = path == AppRoutes.login || path == AppRoutes.register;
 
       if (!isLoggedIn && !isLoggingIn) return AppRoutes.login;
       if (isLoggedIn && isLoggingIn) return AppRoutes.dashboard;
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
+      ),
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
@@ -106,6 +124,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.parametres,
         builder: (context, state) => const ParametresScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.courbe,
+        builder: (context, state) => const CourbeCroissanceScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.rdv,
+        builder: (context, state) => const RdvScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.ussd,
+        builder: (context, state) => const UssdScreen(),
       ),
     ],
   );

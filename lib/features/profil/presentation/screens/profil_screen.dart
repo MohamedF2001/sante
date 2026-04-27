@@ -13,120 +13,146 @@ class ProfilScreen extends ConsumerWidget {
     final userProfile = ref.watch(userProfileProvider).valueOrNull;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mon Profil'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => context.push(AppRoutes.parametres),
-          ),
-        ],
-      ),
+      backgroundColor: AppColors.vertBg,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            Center(
+            // Header
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(16, 60, 16, 50),
+              decoration: const BoxDecoration(
+                color: AppColors.vertForet,
+              ),
               child: Stack(
                 children: [
-                  const CircleAvatar(
-                    radius: 50,
-                    backgroundColor: AppColors.primarySurface,
-                    child: Icon(Icons.person, size: 50, color: AppColors.primary),
-                  ),
                   Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: CircleAvatar(
-                      radius: 18,
-                      backgroundColor: AppColors.primary,
-                      child: IconButton(
-                        icon: const Icon(Icons.edit, size: 16, color: Colors.white),
-                        onPressed: () {},
-                      ),
+                    top: -60,
+                    right: -40,
+                    child: Container(
+                      width: 180,
+                      height: 180,
+                      decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), shape: BoxShape.circle),
                     ),
+                  ),
+                  Column(
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                          alignment: Alignment.center,
+                          child: const Text('👩', style: TextStyle(fontSize: 30)),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '${userProfile?.prenom ?? "Aicha"} ${userProfile?.nom ?? "Traoré"}',
+                        style: const TextStyle(fontFamily: 'Playfair Display', fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${userProfile?.email ?? "aicha@email.com"} · ${userProfile?.telephone ?? "+229 97 00 00 00"}',
+                        style: const TextStyle(fontSize: 10, color: AppColors.vertClair),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              '${userProfile?.prenom ?? ""} ${userProfile?.nom ?? ""}',
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+
+            // Body
+            Container(
+              margin: const EdgeInsets.only(top: -24),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Column(
+                children: [
+                  _buildSectionCard([
+                    _buildItem('👶', '${userProfile?.nomEnfant ?? "Ibrahim"} · 4 mois', () {}),
+                    _buildItem('➕', 'Ajouter un profil', () {}, isAction: true),
+                  ]),
+
+                  _buildSectionCard([
+                    _buildItem('✏️', 'Modifier le profil', () {}),
+                    _buildItem('📋', 'Mes documents médicaux', () => context.push(AppRoutes.scans)),
+                    _buildItem('📅', 'Mes rendez-vous', () => context.push(AppRoutes.rdv)),
+                    _buildItem('📊', 'Courbe de croissance', () => context.push(AppRoutes.courbe)),
+                  ]),
+
+                  _buildSectionCard([
+                    _buildItem('⚙️', 'Paramètres', () => context.push(AppRoutes.parametres)),
+                    _buildItem('❓', 'Aide & Support', () {}),
+                    _buildItem('⭐', 'Évaluer l\'application', () {}),
+                  ]),
+
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () => ref.read(authNotifierProvider.notifier).logout(),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(13),
+                        border: Border.all(color: AppColors.terracotta.withOpacity(0.15)),
+                        boxShadow: [BoxShadow(color: AppColors.terracotta.withOpacity(0.1), blurRadius: 8)],
+                      ),
+                      child: const Row(
+                        children: [
+                          Text('🚪', style: TextStyle(fontSize: 18)),
+                          SizedBox(width: 12),
+                          Text('Se déconnecter', style: TextStyle(color: AppColors.terracotta, fontWeight: FontWeight.bold, fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
-            Text(
-              userProfile?.email ?? "",
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 24),
-            _buildInfoCard(userProfile),
-            const SizedBox(height: 24),
-            _buildActionList(context, ref),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoCard(user) {
+  Widget _buildSectionCard(List<Widget> children) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10),
-        ],
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [BoxShadow(color: AppColors.vertForet.withOpacity(0.1), blurRadius: 32)],
       ),
-      child: Column(
-        children: [
-          _infoRow(Icons.child_care, 'Enfant', user?.nomEnfant ?? "-"),
-          const Divider(),
-          _infoRow(Icons.phone, 'Téléphone', user?.telephone ?? "-"),
-        ],
-      ),
+      child: Column(children: children),
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.primary, size: 20),
-          const SizedBox(width: 12),
-          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
-          const Spacer(),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionList(BuildContext context, WidgetRef ref) {
-    return Column(
-      children: [
-        _actionTile(Icons.show_chart, 'Courbe de croissance', () {}),
-        _actionTile(Icons.calendar_today, 'Mes rendez-vous', () {}),
-        _actionTile(Icons.people_outline, 'Ajouter un profil enfant', () {}),
-        _actionTile(Icons.help_outline, 'Support & Aide', () {}),
-        const SizedBox(height: 20),
-        ListTile(
-          leading: const Icon(Icons.logout, color: AppColors.danger),
-          title: const Text('Déconnexion', style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold)),
-          onTap: () => ref.read(authNotifierProvider.notifier).logout(),
-        ),
-      ],
-    );
-  }
-
-  Widget _actionTile(IconData icon, String label, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: AppColors.textPrimary),
-      title: Text(label),
-      trailing: const Icon(Icons.chevron_right),
+  Widget _buildItem(String icon, String label, VoidCallback onTap, {bool isAction = false}) {
+    return InkWell(
       onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: AppColors.grisPerle)),
+        ),
+        child: Row(
+          children: [
+            SizedBox(width: 24, child: Text(icon, style: const TextStyle(fontSize: 18), textAlign: TextAlign.center)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isAction ? FontWeight.w600 : FontWeight.w500,
+                  color: isAction ? AppColors.vertForet : AppColors.noirDoux,
+                ),
+              ),
+            ),
+            const Icon(Icons.chevron_right, size: 16, color: AppColors.grisTexte),
+          ],
+        ),
+      ),
     );
   }
 }

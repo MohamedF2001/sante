@@ -15,6 +15,9 @@ class AppRoutes {
   static const String postDetail = '/post-detail';
   static const String profil = '/profil';
   static const String parametres = '/parametres';
+  static const String courbe = '/courbe';
+  static const String rdv = '/rdv';
+  static const String ussd = '/ussd';
 
   AppRoutes._();
 }

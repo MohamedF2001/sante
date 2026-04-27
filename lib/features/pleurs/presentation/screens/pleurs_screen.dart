@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sante_famille/core/constants/app_colors.dart';
-import 'package:sante_famille/core/widgets/custom_button.dart';
 
 class PleursScreen extends StatefulWidget {
   const PleursScreen({super.key});
@@ -56,81 +55,110 @@ class _PleursScreenState extends State<PleursScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Analyse des pleurs')),
+      backgroundColor: AppColors.noirDoux,
+      appBar: AppBar(
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Analyseur de Pleurs'),
+            Text('IA · Identification des besoins', style: TextStyle(fontSize: 12, color: AppColors.vertClair)),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.mic_rounded, size: 80, color: AppColors.primary),
-            const SizedBox(height: 24),
-            const Text(
-              'Enregistrez les pleurs de bébé pour comprendre ses besoins.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 48),
-            if (_isAnalyzing) ...[
-              const Text('Analyse en cours...', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              LinearProgressIndicator(
-                value: _progress,
-                backgroundColor: AppColors.border,
-                color: AppColors.primary,
-                minHeight: 10,
-              ),
+            if (_result != null && !_isAnalyzing) ...[
+              const Text('Résultat de la dernière analyse', style: TextStyle(fontSize: 12, color: Colors.white54)),
               const SizedBox(height: 8),
-              Text('${(_progress * 100).toInt()}%'),
-            ] else if (_result != null) ...[
               Container(
                 padding: const EdgeInsets.all(20),
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: AppColors.primary),
+                  color: Colors.white.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: Column(
                   children: [
-                    const Text('Résultat de l\'analyse', style: TextStyle(fontSize: 14)),
+                    const Text('🍼', style: TextStyle(fontSize: 32)),
                     const SizedBox(height: 8),
                     Text(
-                      _result!,
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      'Bébé a probablement $_result',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.vertClair),
                     ),
-                    const SizedBox(height: 8),
-                    Text('Confiance : $_confidence%', style: const TextStyle(color: AppColors.textSecondary)),
+                    const SizedBox(height: 4),
+                    Text('Confiance : $_confidence% · À l\'instant', style: const TextStyle(color: Colors.white54, fontSize: 12)),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              CustomButton(
-                label: 'Recommencer',
-                onPressed: _startAnalysis,
-              ),
-            ] else ...[
-              CustomButton(
-                label: 'Démarrer l\'enregistrement',
-                icon: Icons.play_arrow,
-                onPressed: _startAnalysis,
-              ),
+              const SizedBox(height: 40),
             ],
-            const SizedBox(height: 24),
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: AppColors.primary),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Cette fonctionnalité utilise une IA simulée pour la démonstration.',
-                        style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
-                      ),
-                    ),
-                  ],
+
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: AppColors.vertDoux.withOpacity(0.05),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.vertDoux.withOpacity(0.15)),
+                  ),
                 ),
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: AppColors.vertDoux.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.vertDoux.withOpacity(0.3)),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text('🎙️', style: TextStyle(fontSize: 40)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              _isAnalyzing ? 'Analyse en cours... (${(_progress * 100).toInt()}%)' : 'Appuyez pour enregistrer les pleurs',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 14, color: Colors.white70),
+            ),
+            const Text(
+              'Durée recommandée : 10-15 secondes',
+              style: TextStyle(fontSize: 11, color: Colors.white30),
+            ),
+            const SizedBox(height: 32),
+
+            if (_isAnalyzing)
+              SizedBox(
+                width: 200,
+                child: LinearProgressIndicator(
+                  value: _progress,
+                  backgroundColor: Colors.white10,
+                  color: AppColors.vertDoux,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              )
+            else
+              ElevatedButton(
+                onPressed: _startAnalysis,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.vertDoux,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+                ),
+                child: const Text('⏺ Démarrer l\'analyse', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
+
+            const SizedBox(height: 48),
+            const Text(
+              '⚠️ Aide à la décision uniquement. Consultez un médecin en cas de doute.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 10, color: Colors.white24, height: 1.7),
             ),
           ],
         ),

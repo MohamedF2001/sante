@@ -6,102 +6,82 @@ class NutritionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final conseils = [
-      {
-        'age': '0-6 mois',
-        'titre': 'Allaitement exclusif',
-        'conseil': 'Le lait maternel apporte tout ce dont bébé a besoin : eau, vitamines et anticorps. Pas besoin d\'eau ni de tisanes.',
-        'icon': Icons.child_care
-      },
-      {
-        'age': '6-9 mois',
-        'titre': 'Début de la diversification',
-        'conseil': 'Introduisez les purées de légumes (carottes, courges) puis de fruits. Continuez l\'allaitement à la demande.',
-        'icon': Icons.restaurant
-      },
-      {
-        'age': '9-12 mois',
-        'titre': 'Textures plus épaisses',
-        'conseil': 'Proposez des aliments écrasés ou en petits morceaux tendres. Introduisez les protéines (œuf, poisson, viande hachée).',
-        'icon': Icons.set_meal
-      },
-      {
-        'age': '1-3 ans',
-        'titre': 'Comme les grands',
-        'conseil': 'L\'enfant peut manger de tout, mais attention au sel et au sucre ajouté. Favorisez les produits locaux et frais.',
-        'icon': Icons.family_restroom
-      },
-    ];
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Conseils Nutrition')),
+      backgroundColor: AppColors.vertBg,
+      appBar: AppBar(
+        title: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Nutrition Locale'),
+            Text('Alimentation béninoise pour bébé', style: TextStyle(fontSize: 12, color: AppColors.vertClair)),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Alimentation par âge',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
+            Container(
+              padding: const EdgeInsets.all(13),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(colors: [AppColors.vertPastel, AppColors.vertBg]),
+                borderRadius: BorderRadius.circular(13),
+                border: const Border(left: BorderSide(color: AppColors.vertDoux, width: 3)),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('💡 Conseil du jour · Ibrahim (4 mois)', style: TextStyle(color: AppColors.vertForet, fontWeight: FontWeight.bold, fontSize: 13)),
+                  SizedBox(height: 4),
+                  Text(
+                    'L\'allaitement exclusif est recommandé jusqu\'à 6 mois. À 6 mois, commencez par la bouillie de mil enrichie au soja pour une bonne croissance.',
+                    style: TextStyle(color: AppColors.grisTexte, fontSize: 11, height: 1.7),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            ...conseils.map((c) => Card(
-              margin: const EdgeInsets.only(bottom: 16),
-              elevation: 2,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: AppColors.primarySurface,
-                      child: Icon(c['icon'] as IconData, color: AppColors.primary),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            c['age'] as String,
-                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
-                          ),
-                          Text(
-                            c['titre'] as String,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(c['conseil'] as String, style: const TextStyle(color: AppColors.textSecondary)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )),
             const SizedBox(height: 20),
-            const Card(
-              color: AppColors.primary,
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    Text(
-                      'Le saviez-vous ?',
-                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'La bouillie enrichie à base de farines locales (mil, soja, arachide) est un excellent complément après 6 mois.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ],
-                ),
-              ),
+            Text('ALIMENTS RECOMMANDÉS (6+ MOIS)', style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.grisTexte)),
+            const SizedBox(height: 12),
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1.5,
+              children: [
+                _buildNutriCard('🌾', 'Bouillie de mil', 'Fer · Zinc · Énergie'),
+                _buildNutriCard('🫘', 'Soja enrichi', 'Protéines complètes'),
+                _buildNutriCard('🌿', 'Moringa', 'Vitamines A, C, K'),
+                _buildNutriCard('🍌', 'Banane plantain', 'Potassium · Glucides'),
+                _buildNutriCard('🥜', 'Arachide', 'Lipides · Protéines'),
+                _buildNutriCard('🐟', 'Poisson fumé', 'Oméga-3 · Calcium'),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNutriCard(String icon, String title, String sub) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(13),
+        boxShadow: [BoxShadow(color: AppColors.vertForet.withOpacity(0.06), blurRadius: 8)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(icon, style: const TextStyle(fontSize: 24)),
+          const SizedBox(height: 6),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.noirDoux)),
+          Text(sub, style: const TextStyle(fontSize: 10, color: AppColors.grisTexte)),
+        ],
       ),
     );
   }

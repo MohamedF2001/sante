@@ -14,53 +14,119 @@ class VaccinsScreen extends ConsumerWidget {
     final vaccinsAsync = ref.watch(vaccinsProvider);
 
     return Scaffold(
-      body: vaccinsAsync.when(
-        data: (vaccins) {
-          if (vaccins.isEmpty) {
-            return const Center(child: Text('Aucun vaccin enregistré.'));
-          }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: vaccins.length,
-            itemBuilder: (context, index) {
-              final vaccin = vaccins[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: vaccin.estFait ? AppColors.success : AppColors.warning,
-                    child: Icon(
-                      vaccin.estFait ? Icons.check : Icons.access_time,
-                      color: Colors.white,
+      backgroundColor: AppColors.vertBg,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              child: Text(
+                '✅ RÉALISÉS',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.grisTexte),
+              ),
+            ),
+          ),
+          vaccinsAsync.when(
+            data: (vaccins) {
+              final faits = vaccins.where((v) => v.estFait).toList();
+              final aVenir = vaccins.where((v) => !v.estFait).toList();
+
+              return SliverList(
+                delegate: SliverChildListDelegate([
+                  if (faits.isEmpty)
+                    const Padding(padding: EdgeInsets.all(16), child: Text('Aucun vaccin réalisé')),
+                  ...faits.map((v) => _buildVaccinItem(context, v, true, ref)),
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                    child: Text(
+                      '⏳ À VENIR',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(color: AppColors.grisTexte),
                     ),
                   ),
-                  title: Text(
-                    vaccin.nom,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      decoration: vaccin.estFait ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                  subtitle: Text('Date: ${DateFormatter.formatDate(vaccin.date)}'),
-                  trailing: Checkbox(
-                    value: vaccin.estFait,
-                    onChanged: (val) {
-                      ref.read(carnetServiceProvider).toggleVaccinStatus(vaccin.id, vaccin.estFait);
-                    },
-                    activeColor: AppColors.primary,
-                  ),
-                ),
+
+                  if (aVenir.isEmpty)
+                    const Padding(padding: EdgeInsets.all(16), child: Text('Tous les vaccins sont à jour !')),
+                  ...aVenir.map((v) => _buildVaccinItem(context, v, false, ref)),
+                ]),
               );
             },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, s) => Center(child: Text('Erreur: $e')),
+            loading: () => const SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
+            error: (e, s) => SliverFillRemaining(child: Center(child: Text('Erreur: $e'))),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push(AppRoutes.addVaccin),
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.vertForet,
         child: const Icon(Icons.add, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildVaccinItem(BuildContext context, dynamic vaccin, bool isDone, WidgetRef ref) {
+    final bool isSoon = !isDone && vaccin.date.difference(DateTime.now()).inDays <= 2;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: isSoon ? Border.all(color: AppColors.ocre, width: 1.5) : null,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: isDone ? AppColors.vertNature : (isSoon ? AppColors.ocre : AppColors.grisDoux),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  vaccin.nom,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.noirDoux),
+                ),
+                Text(
+                  'Date: ${DateFormatter.formatDate(vaccin.date)}',
+                  style: const TextStyle(fontSize: 11, color: AppColors.grisTexte),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: isDone ? AppColors.vertPastel : (isSoon ? AppColors.ocreClair : AppColors.grisDoux),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              isDone ? 'Fait' : (isSoon ? 'J-2' : 'Planifié'),
+              style: TextStyle(
+                color: isDone ? AppColors.vertForet : (isSoon ? AppColors.terracotta : AppColors.grisTexte),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Checkbox(
+            value: isDone,
+            onChanged: (val) {
+              ref.read(carnetServiceProvider).toggleVaccinStatus(vaccin.id, vaccin.estFait);
+            },
+            activeColor: AppColors.vertForet,
+          ),
+        ],
       ),
     );
   }
