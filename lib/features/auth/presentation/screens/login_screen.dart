@@ -1,12 +1,10 @@
-// ============================================================
-// lib/features/auth/presentation/screens/login_screen.dart
-// Écran de connexion — correspond à l'Écran 6 du design
-// ============================================================
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../core/constants/app_colors.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sante_famille/core/constants/app_colors.dart';
+import 'package:sante_famille/core/constants/app_routes.dart';
+import 'package:sante_famille/core/widgets/custom_button.dart';
+import 'package:sante_famille/core/widgets/custom_text_field.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -30,7 +28,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     await ref.read(authNotifierProvider.notifier).login(
       email: _emailCtrl.text.trim(),
       password: _passwordCtrl.text.trim(),
@@ -43,195 +40,181 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     ref.listen<AuthState>(authNotifierProvider, (prev, next) {
       if (next.status == AuthStatus.success) {
-        Navigator.of(context).pushReplacementNamed('/dashboard');
+        context.go(AppRoutes.dashboard);
       } else if (next.status == AuthStatus.error) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage ?? 'Erreur'),
-            backgroundColor: AppColors.danger,
-          ),
+          SnackBar(content: Text(next.errorMessage ?? 'Erreur'), backgroundColor: AppColors.terracotta),
         );
       }
     });
 
     return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // ─── Header vert ──────────────────────────────
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 48, 24, 40),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40),
+      backgroundColor: AppColors.vertBg,
+      body: Column(
+        children: [
+          // Hero section
+          Container(
+            height: MediaQuery.of(context).size.height * 0.4,
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: AppColors.vertForet,
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Positioned(
+                  top: -70,
+                  right: -50,
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: AppColors.vertClair.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
-                child: Column(
+                Positioned(
+                  bottom: -30,
+                  left: -20,
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: AppColors.ocre.withOpacity(0.08),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Logo
                     Container(
-                      width: 60,
-                      height: 60,
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 20),
+                        ],
                       ),
-                      child: const Icon(
-                        Icons.health_and_safety,
-                        color: AppColors.primary,
-                        size: 32,
-                      ),
+                      alignment: Alignment.center,
+                      child: const Text('🌿', style: TextStyle(fontSize: 30)),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     const Text(
                       'Santé Famille',
                       style: TextStyle(
+                        fontFamily: 'Playfair Display',
+                        fontSize: 24,
                         color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'BON RETOUR PARMI NOUS',
                       style: TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
-                        letterSpacing: 1.5,
+                        fontSize: 10,
+                        color: AppColors.vertClair,
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.w500,
                       ),
+                    ),
+                    const SizedBox(height: 28),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.vertForet.withOpacity(0.1),
+                      blurRadius: 32,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-              ),
-
-              // ─── Formulaire ───────────────────────────────
-              Padding(
-                padding: const EdgeInsets.all(24),
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 8),
-
-                      // Email / Téléphone
-                      const Text('TÉLÉPHONE OU EMAIL',
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.5,
-                              color: AppColors.textSecondary)),
-                      const SizedBox(height: 6),
-                      TextFormField(
+                      CustomTextField(
+                        label: 'Téléphone ou Email',
                         controller: _emailCtrl,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (v) => (v == null || v.isEmpty)
-                            ? 'Champ requis'
-                            : null,
-                        decoration: const InputDecoration(
-                          hintText: '+229 97 00 00 00',
-                          prefixIcon:
-                          Icon(Icons.phone_outlined, size: 18, color: AppColors.textLight),
-                        ),
+                        prefixIcon: Icons.phone_android,
+                        hint: '+229 97 00 00 00',
                       ),
                       const SizedBox(height: 20),
-
-                      // Mot de passe
-                      _PasswordField(controller: _passwordCtrl),
+                      CustomTextField(
+                        label: 'Mot de passe',
+                        controller: _passwordCtrl,
+                        prefixIcon: Icons.lock_outline,
+                        obscureText: true,
+                        hint: '••••••••',
+                      ),
                       const SizedBox(height: 8),
-
-                      // Mot de passe oublié
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {
-                            // TODO: implémenter la réinitialisation
-                          },
+                          onPressed: () {},
                           child: const Text(
                             'Mot de passe oublié ?',
-                            style: TextStyle(
-                                color: AppColors.primary, fontSize: 13),
+                            style: TextStyle(color: AppColors.vertForet, fontWeight: FontWeight.w600, fontSize: 12),
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Bouton connexion
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: authState.status == AuthStatus.loading
-                              ? null
-                              : _submit,
-                          child: authState.status == AuthStatus.loading
-                              ? const CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2)
-                              : const Text('Se connecter →'),
-                        ),
+                      CustomButton(
+                        label: 'Se connecter →',
+                        onPressed: _submit,
+                        isLoading: authState.status == AuthStatus.loading,
                       ),
                       const SizedBox(height: 20),
-
-                      // Séparateur "ou"
                       Row(
                         children: [
-                          const Expanded(
-                              child: Divider(color: AppColors.border)),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text('ou',
-                                style: TextStyle(
-                                    color: AppColors.textLight, fontSize: 13)),
+                          const Expanded(child: Divider(color: AppColors.grisDoux)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text('ou', style: TextStyle(color: AppColors.grisTexte, fontSize: 12)),
                           ),
-                          const Expanded(
-                              child: Divider(color: AppColors.border)),
+                          const Expanded(child: Divider(color: AppColors.grisDoux)),
                         ],
                       ),
                       const SizedBox(height: 20),
-
-                      // Google Sign-In (bouton outline)
-                      SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            // TODO: Google Sign-In (optionnel pour MVP)
-                          },
-                          icon: const Icon(Icons.g_mobiledata,
-                              color: AppColors.textSecondary),
-                          label: const Text('Continuer avec Google',
-                              style: TextStyle(color: AppColors.textSecondary)),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.border),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                          ),
+                      OutlinedButton.icon(
+                        onPressed: () {},
+                        icon: const Text('🇬'),
+                        label: const Text('Continuer avec Google', style: TextStyle(color: AppColors.noirDoux)),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 48),
+                          side: const BorderSide(color: AppColors.grisDoux),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
                         ),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Lien inscription
+                      const SizedBox(height: 20),
                       Center(
                         child: GestureDetector(
-                          onTap: () => Navigator.pushReplacementNamed(
-                              context, '/register'),
+                          onTap: () => context.go(AppRoutes.register),
                           child: RichText(
                             text: const TextSpan(
                               text: 'Pas encore de compte ? ',
-                              style: TextStyle(
-                                  color: AppColors.textSecondary, fontSize: 14),
+                              style: TextStyle(color: AppColors.grisTexte, fontSize: 14),
                               children: [
                                 TextSpan(
                                   text: 'S\'inscrire',
-                                  style: TextStyle(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: TextStyle(color: AppColors.vertForet, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -242,58 +225,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Widget séparé pour le champ mot de passe (toggle visibility)
-class _PasswordField extends StatefulWidget {
-  final TextEditingController controller;
-  const _PasswordField({required this.controller});
-
-  @override
-  State<_PasswordField> createState() => _PasswordFieldState();
-}
-
-class _PasswordFieldState extends State<_PasswordField> {
-  bool _visible = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('MOT DE PASSE',
-            style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-                color: AppColors.textSecondary)),
-        const SizedBox(height: 6),
-        TextFormField(
-          controller: widget.controller,
-          obscureText: !_visible,
-          validator: (v) {
-            if (v == null || v.isEmpty) return 'Champ requis';
-            if (v.length < 6) return 'Minimum 6 caractères';
-            return null;
-          },
-          decoration: InputDecoration(
-            hintText: '••••••••',
-            prefixIcon:
-            const Icon(Icons.lock_outline, size: 18, color: AppColors.textLight),
-            suffixIcon: IconButton(
-              icon: Icon(_visible ? Icons.visibility : Icons.visibility_off,
-                  size: 18, color: AppColors.textLight),
-              onPressed: () => setState(() => _visible = !_visible),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

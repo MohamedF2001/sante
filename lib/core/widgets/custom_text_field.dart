@@ -60,14 +60,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: InputDecoration(
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, size: 20, color: AppColors.textLight)
+                ? Icon(widget.prefixIcon, size: 20, color: AppColors.textSecondary)
                 : null,
             suffixIcon: widget.obscureText
                 ? IconButton(
               icon: Icon(
                 _hidden ? Icons.visibility_off : Icons.visibility,
                 size: 20,
-                color: AppColors.textLight,
+                color: AppColors.textSecondary,
               ),
               onPressed: () => setState(() => _hidden = !_hidden),
             )
