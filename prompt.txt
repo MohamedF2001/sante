@@ -1,0 +1,196 @@
+Tu es un expert senior en développement mobile Flutter, Firebase et architecture logicielle.
+
+Ta mission est de générer un projet complet, propre et prêt pour une soutenance académique.
+
+🎯 CONTEXTE DU PROJET
+
+Je suis un étudiant débutant en développement mobile.
+Je dois créer une application mobile appelée "Santé Famille" pour ma soutenance.
+
+L’objectif est de créer un MVP fonctionnel, propre, bien structuré, avec Firebase comme backend.
+
+⚠️ Important : certaines fonctionnalités IA seront simulées (pas d’implémentation réelle).
+
+🧱 STACK TECHNIQUE OBLIGATOIRE
+Flutter (Dart)
+Clean Architecture simplifiée (features-based)
+State management : Riverpod
+Backend : Firebase (Auth + Firestore + Storage)
+UI moderne et professionnelle
+📱 FONCTIONNALITÉS DE L’APPLICATION
+🔐 Authentification
+Inscription :
+Nom
+Prénom
+Téléphone
+Email
+Mot de passe
+Nom de l’enfant
+Connexion :
+Email ou téléphone + mot de passe
+🏠 Dashboard
+
+6 modules :
+
+Carnet de santé
+Analyse des pleurs (simulation IA)
+Analyse de taille (simulation IA)
+Hôpitaux proches (remplace pharmacies)
+Encyclopédie
+Nutrition
+Bottom Navigation :
+Accueil
+Forum
+Profil
+📒 MODULE 1 : CARNET DE SANTÉ (IMPORTANT)
+
+Le module est divisé en 2 parties :
+
+1. Vaccins
+Ajouter un vaccin
+Voir vaccins effectués
+Voir vaccins à venir
+2. Scan du carnet de santé
+Scanner ou importer une image du carnet
+Sauvegarder l’image dans Firebase Storage
+Afficher les scans enregistrés
+🎤 Analyse des pleurs (SIMULATION)
+Bouton enregistrer audio
+Résultat simulé :
+Faim / Fatigue / Douleur
+Score %
+📸 Analyse de taille (SIMULATION)
+Prendre une photo
+Retour :
+Taille estimée (simulée)
+🏥 HÔPITAUX PROCHES
+
+(MVP simple)
+
+Liste statique ou mock data
+Nom
+Adresse
+Distance simulée
+📚 Encyclopédie
+Articles de conseils santé
+Catégories
+Lecture simple
+🥗 Nutrition
+Conseils nutritionnels
+Recommandations par âge
+💬 Forum
+Poster une question
+Commenter
+Like
+👤 PROFIL (IMPORTANT)
+
+Afficher les informations utilisateur + paramètres :
+
+Paramètres :
+Courbe de croissance (UI simple avec données mock)
+Ajouter un profil (ex : plusieurs enfants)
+Mes rendez-vous (liste simple mock)
+Changer de langue
+Support / aide
+Déconnexion
+🧠 CE QUE TU DOIS GÉNÉRER
+1. 📁 ARCHITECTURE COMPLÈTE FLUTTER
+
+Structure claire :
+
+lib/
+
+core/
+features/
+auth/
+dashboard/
+carnet/
+forum/
+profil/
+
+Avec :
+
+data
+domain (simplifié)
+presentation
+2. 🔥 CONFIGURATION FIREBASE (ÉTAPE PAR ÉTAPE)
+
+Explique :
+
+Création projet Firebase
+Activation Authentication (email/password)
+Firestore
+Firebase Storage (pour scan carnet)
+Règles de sécurité simples
+Connexion Flutter à Firebase
+3. 🗂 STRUCTURE FIRESTORE OPTIMISÉE
+
+users/
+userId/
+nom
+prenom
+enfant
+email
+
+vaccins/
+vaccinId/
+userId
+nom
+date
+statut
+
+scans/
+scanId/
+userId
+imageUrl
+date
+
+posts/
+postId/
+userId
+contenu
+date
+
+comments/
+commentId/
+postId
+userId
+contenu
+
+4. 🔐 MODULE AUTH COMPLET
+
+Générer :
+
+Model
+Service Firebase
+Repository
+Provider Riverpod
+UI (inscription + connexion)
+5. 📒 MODULE CARNET COMPLET
+Gestion vaccins
+Upload image Firebase Storage
+Affichage scans
+6. 🎨 UI MODERNE
+Design propre
+Couleurs santé (bleu / vert)
+Responsive
+7. 🤖 SIMULATION IA
+
+Créer fonctions mock :
+
+analyserPleurs()
+analyserTaille()
+8. 🎤 SCRIPT DE SOUTENANCE
+
+Donner un texte prêt à dire :
+
+Présentation du projet
+Problème
+Solution
+Démo
+Choix Firebase
+IA simulée (explication pro)
+⚠️ IMPORTANT
+Générer étape par étape
+Code clair et commenté
+Explications simples (niveau étudiant)
