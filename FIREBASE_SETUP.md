@@ -30,10 +30,12 @@ Le plus simple est d'utiliser la CLI FlutterFire :
 3. Choisissez **"Start in test mode"** (pour le développement) et votre région.
 4. Les collections seront créées automatiquement lors de la première utilisation de l'app.
 
-### C. Firebase Storage (Images)
-1. Allez dans **Build > Storage**.
+### C. Firebase Storage (Images) - OPTIONNEL
+*Note : Dans cette version de l'application, le stockage est simulé pour éviter d'avoir à configurer un compte de facturation Google Cloud.*
+1. Si vous souhaitez l'activer réellement plus tard : Allez dans **Build > Storage**.
 2. Cliquez sur **Get Started**.
 3. Choisissez **"Start in test mode"** et validez.
+4. Réactivez le code réel dans `lib/features/carnet/data/carnet_service.dart`.
 
 ## 4. Règles de sécurité (Important)
 Pour que l'application puisse lire et écrire des données, utilisez ces règles simplifiées en mode test :

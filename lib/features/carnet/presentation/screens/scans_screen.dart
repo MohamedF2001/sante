@@ -52,6 +52,23 @@ class _ScansScreenState extends ConsumerState<ScansScreen> {
     final scansAsync = ref.watch(scansProvider);
 
     return Scaffold(
+      appBar: _isUploading ? null : AppBar(
+        title: const Text('Mes Documents', style: TextStyle(fontSize: 16)),
+        backgroundColor: Colors.transparent,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
+        actions: [
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.only(right: 16),
+              child: Text(
+                'MODE DEMO',
+                style: TextStyle(color: AppColors.warning, fontWeight: FontWeight.bold, fontSize: 10),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: _isUploading
           ? const Center(child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
