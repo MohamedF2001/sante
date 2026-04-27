@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "861039145649",
+    "project_id": "santefamille-c95e3",
+    "storage_bucket": "santefamille-c95e3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861039145649:android:052da8f405447ee27da890",
+        "android_client_info": {
+          "package_name": "com.example.sante_famille"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBie7b5l6qVohtxxHz7tHAo8YXx7fQVwUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
