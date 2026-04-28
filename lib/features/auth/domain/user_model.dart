@@ -1,7 +1,8 @@
 // ============================================================
 // lib/features/auth/domain/user_model.dart
-// Modèle utilisateur
 // ============================================================
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserModel {
   final String uid;
@@ -24,7 +25,8 @@ class UserModel {
     this.photoUrl,
   });
 
-  // Convertit un document Firestore en UserModel
+  String get fullName => '$prenom $nom';
+
   factory UserModel.fromFirestore(Map<String, dynamic> data, String uid) {
     return UserModel(
       uid: uid,
@@ -33,30 +35,22 @@ class UserModel {
       email: data['email'] ?? '',
       telephone: data['telephone'] ?? '',
       nomEnfant: data['nomEnfant'] ?? '',
-      dateNaissanceEnfant: data['dateNaissanceEnfant'] != null
-          ? (data['dateNaissanceEnfant'] as dynamic).toDate()
-          : null,
+      dateNaissanceEnfant:
+      (data['dateNaissanceEnfant'] as Timestamp?)?.toDate(),
       photoUrl: data['photoUrl'],
     );
   }
 
-  // Convertit le UserModel en Map pour Firestore
-  Map<String, dynamic> toMap() {
-    return {
-      'nom': nom,
-      'prenom': prenom,
-      'email': email,
-      'telephone': telephone,
-      'nomEnfant': nomEnfant,
-      'dateNaissanceEnfant': dateNaissanceEnfant,
-      'photoUrl': photoUrl,
-      'createdAt': DateTime.now(),
-    };
-  }
-
-  // Nom complet
-  String get fullName => '$prenom $nom';
+  Map<String, dynamic> toMap() => {
+    'nom': nom,
+    'prenom': prenom,
+    'email': email,
+    'telephone': telephone,
+    'nomEnfant': nomEnfant,
+    'dateNaissanceEnfant': dateNaissanceEnfant != null
+        ? Timestamp.fromDate(dateNaissanceEnfant!)
+        : null,
+    'photoUrl': photoUrl,
+    'createdAt': FieldValue.serverTimestamp(),
+  };
 }
-
-
-

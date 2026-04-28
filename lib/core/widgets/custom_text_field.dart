@@ -1,6 +1,5 @@
 // ============================================================
 // lib/core/widgets/custom_text_field.dart
-// Champ de saisie réutilisable
 // ============================================================
 
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class CustomTextField extends StatefulWidget {
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-  bool _hidden = true; // Pour toggle mot de passe
+  bool _hidden = true;
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +43,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
         Text(
           widget.label.toUpperCase(),
           style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-            color: AppColors.textSecondary,
-          ),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+              color: AppColors.textSecondary),
         ),
         const SizedBox(height: 6),
         TextFormField(
@@ -60,15 +58,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
           decoration: InputDecoration(
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon != null
-                ? Icon(widget.prefixIcon, size: 20, color: AppColors.textLight)
+                ? Icon(widget.prefixIcon,
+                size: 20, color: AppColors.textLight)
                 : null,
             suffixIcon: widget.obscureText
                 ? IconButton(
               icon: Icon(
-                _hidden ? Icons.visibility_off : Icons.visibility,
-                size: 20,
-                color: AppColors.textLight,
-              ),
+                  _hidden
+                      ? Icons.visibility_off
+                      : Icons.visibility,
+                  size: 20,
+                  color: AppColors.textLight),
               onPressed: () => setState(() => _hidden = !_hidden),
             )
                 : null,

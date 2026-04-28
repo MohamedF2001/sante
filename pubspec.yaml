@@ -58,6 +58,8 @@ dependencies:
   # Navigation
   go_router: ^13.2.1
 
+  flutter_image_compress:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

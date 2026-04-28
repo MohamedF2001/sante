@@ -1,0 +1,97 @@
+// ============================================================
+// lib/features/carnet/presentation/providers/carnet_provider.dart
+// ============================================================
+
+import 'dart:io';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../data/carnet_service.dart';
+import '../../domain/scan_model.dart';
+import '../../domain/vaccin_model.dart';
+
+// Provider du service
+final carnetServiceProvider = Provider<CarnetService>((_) => CarnetService());
+
+// Provider du userId courant
+final _currentUidProvider = Provider<String?>((ref) {
+  return FirebaseAuth.instance.currentUser?.uid;
+});
+
+// Stream des vaccins (temps réel)
+final vaccinsProvider = StreamProvider<List<VaccinModel>>((ref) {
+  final uid = ref.watch(_currentUidProvider);
+  if (uid == null) return const Stream.empty();
+  return ref.watch(carnetServiceProvider).watchVaccins(uid);
+});
+
+// Vaccins réalisés seulement
+final vaccinsRealisesProvider = Provider<List<VaccinModel>>((ref) {
+  return ref.watch(vaccinsProvider).valueOrNull
+      ?.where((v) => v.isFait)
+      .toList() ?? [];
+});
+
+// Vaccins à venir seulement
+final vaccinsAVenirProvider = Provider<List<VaccinModel>>((ref) {
+  return ref.watch(vaccinsProvider).valueOrNull
+      ?.where((v) => !v.isFait)
+      .toList() ?? [];
+});
+
+// Stream des scans (temps réel)
+final scansProvider = StreamProvider<List<ScanModel>>((ref) {
+  final uid = ref.watch(_currentUidProvider);
+  if (uid == null) return const Stream.empty();
+  return ref.watch(carnetServiceProvider).watchScans(uid);
+});
+
+// ─── Notifier pour les actions ───────────────────────────────
+
+class CarnetNotifier extends StateNotifier<AsyncValue<void>> {
+  final CarnetService _service;
+  final String? _uid;
+
+  CarnetNotifier(this._service, this._uid) : super(const AsyncData(null));
+
+  Future<void> addVaccin(VaccinModel vaccin) async {
+    state = const AsyncLoading();
+    try {
+      await _service.addVaccin(vaccin);
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> marquerFait(String vaccinId) async {
+    await _service.marquerFait(vaccinId, DateTime.now());
+  }
+
+  Future<void> deleteVaccin(String vaccinId) async {
+    await _service.deleteVaccin(vaccinId);
+  }
+
+  Future<void> uploadScan(File imageFile, {String? titre}) async {
+    if (_uid == null) return;
+    state = const AsyncLoading();
+    try {
+      await _service.saveScan(
+          userId: _uid!, imageFile: imageFile, titre: titre);
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+
+  Future<void> deleteScan(ScanModel scan) async {
+    await _service.deleteScan(scan.id);
+  }
+}
+
+final carnetNotifierProvider =
+StateNotifierProvider<CarnetNotifier, AsyncValue<void>>((ref) {
+  return CarnetNotifier(
+    ref.read(carnetServiceProvider),
+    FirebaseAuth.instance.currentUser?.uid,
+  );
+});

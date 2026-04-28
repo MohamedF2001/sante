@@ -1,9 +1,9 @@
 // ============================================================
 // lib/core/widgets/custom_button.dart
-// Bouton principal réutilisable
 // ============================================================
 
 import 'package:flutter/material.dart';
+
 import '../constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
   final bool isLoading;
   final IconData? icon;
   final Color? backgroundColor;
+  final double height;
 
   const CustomButton({
     super.key,
@@ -20,30 +21,29 @@ class CustomButton extends StatelessWidget {
     this.isLoading = false,
     this.icon,
     this.backgroundColor,
+    this.height = 52,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 52,
+      height: height,
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor ?? AppColors.primary,
           foregroundColor: AppColors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+              borderRadius: BorderRadius.circular(12)),
+          elevation: 0,
         ),
         child: isLoading
             ? const SizedBox(
           width: 22,
           height: 22,
           child: CircularProgressIndicator(
-            color: AppColors.white,
-            strokeWidth: 2.5,
-          ),
+              color: Colors.white, strokeWidth: 2.5),
         )
             : Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -52,13 +52,9 @@ class CustomButton extends StatelessWidget {
               Icon(icon, size: 20),
               const SizedBox(width: 8),
             ],
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w600)),
           ],
         ),
       ),
