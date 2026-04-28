@@ -206,6 +206,7 @@ class _ScanCard extends ConsumerWidget {
     final date = DateFormat('dd/MM/yyyy').format(scan.date);
 
     return GestureDetector(
+      onTap: () => _showFullScreenImage(context),
       onLongPress: () => _showDeleteDialog(context, ref),
       child: Container(
         decoration: BoxDecoration(
@@ -238,6 +239,25 @@ class _ScanCard extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            child: _buildBase64Image(scan.imageBase64),
+          ),
         ),
       ),
     );

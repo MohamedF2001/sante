@@ -9,9 +9,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import '../domain/scan_model.dart';
 import '../domain/vaccin_model.dart';
+import '../domain/mesure_model.dart';
 
 class CarnetService {
   final _db = FirebaseFirestore.instance;
+
+  // ─── MESURES (CROISSANCE) ───────────────────────────────
+
+  Stream<List<MesureModel>> watchMesures(String userId, String enfantId) {
+    return _db
+        .collection('mesures')
+        .where('userId', isEqualTo: userId)
+        .where('enfantId', isEqualTo: enfantId)
+        .snapshots()
+        .map((snap) {
+      final list = snap.docs.map(MesureModel.fromFirestore).toList();
+      list.sort((a, b) => a.date.compareTo(b.date));
+      return list;
+    });
+  }
+
+  Future<void> addMesure(MesureModel mesure) async {
+    await _db.collection('mesures').add(mesure.toMap());
+  }
 
   // ─── VACCINS ─────────────────────────────────────────────
 

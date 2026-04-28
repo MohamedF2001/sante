@@ -5,6 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -75,14 +76,19 @@ class ProfilScreen extends ConsumerWidget {
                   // ── Enfants ─────────────────────────────────
                   _SectionTitle(title: 'MES ENFANTS'),
                   _ProfileCard(children: [
-                    _ChildTile(nom: user?.nomEnfant ?? 'Enfant', age: '4 mois'),
-                    const Divider(height: 1, color: AppColors.border),
+                    if (user != null)
+                      ...user.enfants.map((e) => Column(
+                            children: [
+                              _ChildTile(nom: e.nom, age: 'Enfant'),
+                              const Divider(height: 1, color: AppColors.border),
+                            ],
+                          )),
                     _ActionTile(
                       icon: Icons.add_circle_outline,
                       label: 'Ajouter un profil',
                       iconColor: AppColors.primary,
                       labelColor: AppColors.primary,
-                      onTap: () {},
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.ajouterEnfant),
                     ),
                   ]),
                   const SizedBox(height: 16),
@@ -93,13 +99,13 @@ class ProfilScreen extends ConsumerWidget {
                     _ActionTile(
                       icon: Icons.edit_outlined,
                       label: 'Modifier le profil',
-                      onTap: () {},
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.modifierProfil),
                     ),
                     const Divider(height: 1, color: AppColors.border),
                     _ActionTile(
                       icon: Icons.folder_outlined,
                       label: 'Mes documents médicaux',
-                      onTap: () {},
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.scans),
                     ),
                     const Divider(height: 1, color: AppColors.border),
                     _ActionTile(
@@ -111,7 +117,7 @@ class ProfilScreen extends ConsumerWidget {
                     _ActionTile(
                       icon: Icons.bar_chart_outlined,
                       label: 'Courbe de croissance',
-                      onTap: () {},
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.growthCurve),
                     ),
                   ]),
                   const SizedBox(height: 16),
@@ -129,7 +135,12 @@ class ProfilScreen extends ConsumerWidget {
                     _ActionTile(
                       icon: Icons.help_outline,
                       label: 'Aide & Support',
-                      onTap: () {},
+                      onTap: () async {
+                        final url = Uri.parse('https://wa.me/22969726550');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        }
+                      },
                     ),
                     const Divider(height: 1, color: AppColors.border),
                     _ActionTile(

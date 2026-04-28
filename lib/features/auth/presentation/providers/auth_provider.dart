@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/auth_service.dart';
 import '../../domain/user_model.dart';
+import '../../domain/enfant_model.dart';
 
 // Provider singleton du service
 final authServiceProvider = Provider<AuthService>((_) => AuthService());
@@ -80,6 +81,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> logout() async {
     await _service.logout();
     state = const AuthState();
+  }
+
+  Future<void> updateProfile({
+    required String uid,
+    String? nom,
+    String? prenom,
+    String? email,
+    String? telephone,
+    String? password,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      await _service.updateProfile(
+        uid: uid,
+        nom: nom,
+        prenom: prenom,
+        email: email,
+        telephone: telephone,
+        password: password,
+      );
+      state = state.copyWith(status: AuthStatus.success);
+    } catch (e) {
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+    }
+  }
+
+  Future<void> addEnfant(String uid, EnfantModel enfant) async {
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      await _service.addEnfant(uid, enfant);
+      state = state.copyWith(status: AuthStatus.success);
+    } catch (e) {
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+    }
   }
 
   void resetError() => state = state.copyWith(status: AuthStatus.initial);

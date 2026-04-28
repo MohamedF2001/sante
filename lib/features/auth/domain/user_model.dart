@@ -3,6 +3,7 @@
 // ============================================================
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'enfant_model.dart';
 
 class UserModel {
   final String uid;
@@ -10,9 +11,9 @@ class UserModel {
   final String prenom;
   final String email;
   final String telephone;
-  final String nomEnfant;
-  final DateTime? dateNaissanceEnfant;
+  final List<EnfantModel> enfants;
   final String? photoUrl;
+  final String? activeEnfantId;
 
   UserModel({
     required this.uid,
@@ -20,24 +21,33 @@ class UserModel {
     required this.prenom,
     required this.email,
     required this.telephone,
-    required this.nomEnfant,
-    this.dateNaissanceEnfant,
+    this.enfants = const [],
     this.photoUrl,
+    this.activeEnfantId,
   });
 
   String get fullName => '$prenom $nom';
 
+  EnfantModel? get activeEnfant {
+    if (activeEnfantId == null || enfants.isEmpty) {
+      return enfants.isNotEmpty ? enfants.first : null;
+    }
+    return enfants.firstWhere((e) => e.id == activeEnfantId, orElse: () => enfants.first);
+  }
+
   factory UserModel.fromFirestore(Map<String, dynamic> data, String uid) {
+    final enfantsData = data['enfants'] as List<dynamic>? ?? [];
     return UserModel(
       uid: uid,
       nom: data['nom'] ?? '',
       prenom: data['prenom'] ?? '',
       email: data['email'] ?? '',
       telephone: data['telephone'] ?? '',
-      nomEnfant: data['nomEnfant'] ?? '',
-      dateNaissanceEnfant:
-      (data['dateNaissanceEnfant'] as Timestamp?)?.toDate(),
+      enfants: enfantsData
+          .map((e) => EnfantModel.fromFirestore(e as Map<String, dynamic>, e['id'] ?? ''))
+          .toList(),
       photoUrl: data['photoUrl'],
+      activeEnfantId: data['activeEnfantId'],
     );
   }
 
@@ -46,11 +56,13 @@ class UserModel {
     'prenom': prenom,
     'email': email,
     'telephone': telephone,
-    'nomEnfant': nomEnfant,
-    'dateNaissanceEnfant': dateNaissanceEnfant != null
-        ? Timestamp.fromDate(dateNaissanceEnfant!)
-        : null,
+    'enfants': enfants.map((e) {
+      final map = e.toMap();
+      map['id'] = e.id;
+      return map;
+    }).toList(),
     'photoUrl': photoUrl,
-    'createdAt': FieldValue.serverTimestamp(),
+    'activeEnfantId': activeEnfantId,
+    'updatedAt': FieldValue.serverTimestamp(),
   };
 }

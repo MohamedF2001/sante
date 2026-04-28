@@ -5,6 +5,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../domain/user_model.dart';
+import '../domain/enfant_model.dart';
+import 'package:uuid/uuid.dart';
 
 class AuthService {
   final _auth = FirebaseAuth.instance;
@@ -27,9 +29,21 @@ class AuthService {
           email: email, password: password);
       final uid = cred.user!.uid;
 
+      final premierEnfant = EnfantModel(
+        id: const Uuid().v4(),
+        nom: nomEnfant,
+        genre: 'M',
+        dateNaissance: DateTime.now(),
+      );
+
       final user = UserModel(
-        uid: uid, nom: nom, prenom: prenom,
-        email: email, telephone: telephone, nomEnfant: nomEnfant,
+        uid: uid,
+        nom: nom,
+        prenom: prenom,
+        email: email,
+        telephone: telephone,
+        enfants: [premierEnfant],
+        activeEnfantId: premierEnfant.id,
       );
 
       await _db.collection('users').doc(uid).set(user.toMap());
@@ -38,6 +52,60 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       throw _translateError(e.code);
     }
+  }
+
+  // ─── MODIFIER PROFIL ────────────────────────────────────
+  Future<void> updateProfile({
+    required String uid,
+    String? nom,
+    String? prenom,
+    String? email,
+    String? telephone,
+    String? password,
+  }) async {
+    try {
+      final updates = <String, dynamic>{};
+      if (nom != null) updates['nom'] = nom;
+      if (prenom != null) updates['prenom'] = prenom;
+      if (telephone != null) updates['telephone'] = telephone;
+      if (email != null) {
+        updates['email'] = email;
+        await _auth.currentUser?.updateEmail(email);
+      }
+
+      if (password != null && password.isNotEmpty) {
+        await _auth.currentUser?.updatePassword(password);
+      }
+
+      if (updates.isNotEmpty) {
+        await _db.collection('users').doc(uid).update(updates);
+        if (nom != null || prenom != null) {
+          final doc = await _db.collection('users').doc(uid).get();
+          final currentNom = nom ?? doc.data()?['nom'] ?? '';
+          final currentPrenom = prenom ?? doc.data()?['prenom'] ?? '';
+          await _auth.currentUser?.updateDisplayName('$currentPrenom $currentNom');
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      throw _translateError(e.code);
+    }
+  }
+
+  // ─── AJOUTER ENFANT ─────────────────────────────────────
+  Future<void> addEnfant(String uid, EnfantModel enfant) async {
+    final doc = await _db.collection('users').doc(uid).get();
+    if (!doc.exists) return;
+
+    final user = UserModel.fromFirestore(doc.data()!, uid);
+    final nouveauxEnfants = [...user.enfants, enfant];
+
+    await _db.collection('users').doc(uid).update({
+      'enfants': nouveauxEnfants.map((e) {
+        final map = e.toMap();
+        map['id'] = e.id;
+        return map;
+      }).toList(),
+    });
   }
 
   // ─── CONNEXION ──────────────────────────────────────────
