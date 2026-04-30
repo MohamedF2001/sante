@@ -3,6 +3,7 @@
 // Point d'entrée de l'application Santé Famille
 // ============================================================
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,6 +24,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  await FirebaseAuth.instance.signInAnonymously();
   runApp(
     // ProviderScope est obligatoire pour Riverpod
     const ProviderScope(

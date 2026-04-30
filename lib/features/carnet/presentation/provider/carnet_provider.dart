@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../data/carnet_service.dart';
 import '../../domain/scan_model.dart';
 import '../../domain/vaccin_model.dart';
+import '../../domain/mesure_model.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 // Provider du service
 final carnetServiceProvider = Provider<CarnetService>((_) => CarnetService());
@@ -43,6 +45,16 @@ final scansProvider = StreamProvider<List<ScanModel>>((ref) {
   final uid = ref.watch(_currentUidProvider);
   if (uid == null) return const Stream.empty();
   return ref.watch(carnetServiceProvider).watchScans(uid);
+});
+
+// Stream des mesures (croissance)
+final mesuresProvider = StreamProvider<List<MesureModel>>((ref) {
+  final uid = ref.watch(_currentUidProvider);
+  final user = ref.watch(userProfileProvider).valueOrNull;
+  final enfantId = user?.activeEnfant?.id;
+
+  if (uid == null || enfantId == null) return const Stream.empty();
+  return ref.watch(carnetServiceProvider).watchMesures(uid, enfantId);
 });
 
 // ─── Notifier pour les actions ───────────────────────────────
@@ -85,6 +97,16 @@ class CarnetNotifier extends StateNotifier<AsyncValue<void>> {
 
   Future<void> deleteScan(ScanModel scan) async {
     await _service.deleteScan(scan.id);
+  }
+
+  Future<void> addMesure(MesureModel mesure) async {
+    state = const AsyncLoading();
+    try {
+      await _service.addMesure(mesure);
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
   }
 }
 

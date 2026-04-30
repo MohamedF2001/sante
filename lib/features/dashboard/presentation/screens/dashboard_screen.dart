@@ -11,6 +11,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../carnet/presentation/screens/carnet_screen.dart';
 import '../../../forum/presentation/screens/forum_screen.dart';
 import '../../../profil/presentation/screens/profil_screen.dart';
+import '../../../hopitaux/presentation/screens/hopitaux_screen.dart';
 
 // Provider pour l'index de l'onglet sélectionné
 final bottomNavIndexProvider = StateProvider<int>((_) => 0);
@@ -21,9 +22,8 @@ class DashboardScreen extends ConsumerWidget {
   // Pages associées aux onglets de la bottom navigation
   static const List<Widget> _pages = [
     _HomeTab(),
-     CarnetScreen(),
-    // Carte (placeholder)
-    _CarteTab(),
+    CarnetScreen(),
+    HopitauxScreen(),
     ForumScreen(),
     ProfilScreen(),
   ];
@@ -163,12 +163,12 @@ class _HomeTab extends ConsumerWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(user?.nomEnfant ?? 'Enfant',
+                              Text(user?.activeEnfant?.nom ?? 'Enfant',
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15)),
-                              const Text('4 mois · 5.2 kg · 58 cm',
+                              const Text('Détails de l\'enfant',
                                   style: TextStyle(
                                       color: Colors.white70, fontSize: 12)),
                             ],
@@ -363,28 +363,6 @@ class _ModuleCard extends StatelessWidget {
             Text(subtitle,
                 style: const TextStyle(
                     fontSize: 11, color: AppColors.textSecondary)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Placeholder onglet Carte
-class _CarteTab extends StatelessWidget {
-  const _CarteTab();
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('🗺️', style: TextStyle(fontSize: 60)),
-            SizedBox(height: 12),
-            Text('Carte des centres de santé',
-                style: TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w600)),
           ],
         ),
       ),

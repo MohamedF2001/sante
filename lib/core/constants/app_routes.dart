@@ -18,6 +18,9 @@ import '../../features/nutrition/presentation/screens/nutrition_screen.dart';
 import '../../features/pleurs/presentation/screens/pleurs_screen.dart';
 import '../../features/profil/presentation/screens/parametre_screen.dart';
 import '../../features/profil/presentation/screens/profil_screen.dart';
+import '../../features/profil/presentation/screens/modifier_profil_screen.dart';
+import '../../features/profil/presentation/screens/ajouter_enfant_screen.dart';
+import '../../features/carnet/presentation/screens/growth_curve_screen.dart';
 import '../../features/toise/presentation/screens/toise_screen.dart';
 
 class AppRoutes {
@@ -38,6 +41,9 @@ class AppRoutes {
   static const String postDetail = '/forum/post';
   static const String profil    = '/profil';
   static const String parametres = '/parametres';
+  static const String modifierProfil = '/modifier-profil';
+  static const String ajouterEnfant = '/ajouter-enfant';
+  static const String growthCurve = '/growth-curve';
 
   // Map routes → widgets
   static Map<String, WidgetBuilder> get routes => {
@@ -56,6 +62,9 @@ class AppRoutes {
     postDetail: (_) => const PostDetailScreen(),
     profil:     (_) => const ProfilScreen(),
     parametres: (_) => const ParametresScreen(),
+    modifierProfil: (_) => const ModifierProfilScreen(),
+    ajouterEnfant: (_) => const AjouterEnfantScreen(),
+    growthCurve: (_) => const GrowthCurveScreen(),
   };
 
   AppRoutes._();

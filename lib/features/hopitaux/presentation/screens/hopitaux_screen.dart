@@ -4,6 +4,8 @@
 // ============================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../../core/constants/app_colors.dart';
 
 // Mock data des centres de santé au Bénin
@@ -15,6 +17,8 @@ const _centres = [
     'icon': '🏥',
     'horaires': 'Lun-Ven 8h-17h · Sam 8h-13h',
     'telephone': '+229 21 30 00 00',
+    'lat': 6.3644,
+    'lng': 2.4095,
   },
   {
     'nom': 'Centre PEV Akpakpa',
@@ -23,6 +27,8 @@ const _centres = [
     'icon': '💉',
     'horaires': 'Lun-Ven 8h-16h',
     'telephone': '+229 21 33 12 34',
+    'lat': 6.3600,
+    'lng': 2.4400,
   },
   {
     'nom': 'Hôpital de la Mère et de l\'Enfant',
@@ -31,6 +37,8 @@ const _centres = [
     'icon': '👶',
     'horaires': '24h/24 · 7j/7',
     'telephone': '+229 21 30 05 05',
+    'lat': 6.3500,
+    'lng': 2.4200,
   },
   {
     'nom': 'CHU-MEL',
@@ -39,6 +47,8 @@ const _centres = [
     'icon': '🏨',
     'horaires': '24h/24',
     'telephone': '+229 21 30 01 55',
+    'lat': 6.3450,
+    'lng': 2.4300,
   },
   {
     'nom': 'Clinique Atinkanmey',
@@ -47,6 +57,8 @@ const _centres = [
     'icon': '🩺',
     'horaires': 'Lun-Sam 7h30-20h',
     'telephone': '+229 97 00 11 22',
+    'lat': 6.3700,
+    'lng': 2.4150,
   },
 ];
 
@@ -76,43 +88,47 @@ class _HopitauxScreenState extends State<HopitauxScreen> {
       ),
       backgroundColor: AppColors.background,
       body: Column(children: [
-        // ── Carte simulée ──────────────────────────────────
-        Container(
-          height: 180,
-          width: double.infinity,
-          color: const Color(0xFFD7EDD4),
-          child: Stack(children: [
-            // Grille de carte
-            CustomPaint(painter: _MapPainter(), size: Size.infinite),
-            // Icônes hospitals
-            const Positioned(
-                left: 180, top: 60,
-                child: Text('🏥', style: TextStyle(fontSize: 28))),
-            const Positioned(
-                left: 80, top: 90,
-                child: Text('💉', style: TextStyle(fontSize: 22))),
-            const Positioned(
-                left: 260, top: 100,
-                child: Text('🏥', style: TextStyle(fontSize: 24))),
-            // Badge position
-            Positioned(
-              bottom: 12, right: 12,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                ),
-                child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.location_on, size: 14, color: AppColors.danger),
-                  SizedBox(width: 4),
-                  Text('Cotonou, Bénin',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                ]),
-              ),
+        // ── Carte réelle (OpenStreetMap) ──────────────────
+        Expanded(
+          flex: 2,
+          child: FlutterMap(
+            options: const MapOptions(
+              initialCenter: LatLng(6.3644, 2.4095), // Cotonou
+              initialZoom: 13.0,
             ),
-          ]),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.santefamille.app',
+              ),
+              MarkerLayer(
+                markers: _centres.map((c) {
+                  return Marker(
+                    point: LatLng(c['lat'] as double, c['lng'] as double),
+                    width: 40,
+                    height: 40,
+                    child: GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(c['nom'] as String)),
+                        );
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                        ),
+                        child: Center(
+                          child: Text(c['icon'] as String, style: const TextStyle(fontSize: 20)),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
         ),
 
         // ── Filtres ────────────────────────────────────────
@@ -244,23 +260,4 @@ class _CentreCard extends StatelessWidget {
       ]),
     );
   }
-}
-
-class _MapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFB8DDB8).withOpacity(0.5)
-      ..strokeWidth = 1;
-    // Rues horizontales
-    for (double y = 0; y < size.height; y += 30) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    // Rues verticales
-    for (double x = 0; x < size.width; x += 40) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-  }
-  @override
-  bool shouldRepaint(_) => false;
 }
