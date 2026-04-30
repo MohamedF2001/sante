@@ -54,6 +54,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String email, required String password,
     required String nom,   required String prenom,
     required String telephone, required String nomEnfant,
+    DateTime? dateNaissanceEnfant,
+    String genreEnfant = 'M',
+    String? photoBase64Enfant,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
@@ -61,6 +64,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         email: email, password: password,
         nom: nom, prenom: prenom,
         telephone: telephone, nomEnfant: nomEnfant,
+        dateNaissanceEnfant: dateNaissanceEnfant,
+        genreEnfant: genreEnfant,
+        photoBase64Enfant: photoBase64Enfant,
       );
       state = state.copyWith(status: AuthStatus.success, user: user);
     } catch (e) {
@@ -90,6 +96,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? email,
     String? telephone,
     String? password,
+    String? nomEnfant,
+    DateTime? dateNaissanceEnfant,
+    String? genreEnfant,
+    String? photoBase64Enfant,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
@@ -100,6 +110,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         email: email,
         telephone: telephone,
         password: password,
+        nomEnfant: nomEnfant,
+        dateNaissanceEnfant: dateNaissanceEnfant,
+        genreEnfant: genreEnfant,
+        photoBase64Enfant: photoBase64Enfant,
       );
       state = state.copyWith(status: AuthStatus.success);
     } catch (e) {
