@@ -4,6 +4,7 @@
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../data/forum_service.dart';
 import '../../domain/post_model.dart';
 
@@ -11,12 +12,16 @@ final forumServiceProvider = Provider<ForumService>((_) => ForumService());
 
 // Stream de tous les posts
 final postsProvider = StreamProvider<List<PostModel>>((ref) {
+  final authState = ref.watch(authStateProvider);
+  if (authState.valueOrNull == null) return Stream.value([]);
   return ref.watch(forumServiceProvider).watchPosts();
 });
 
 // Stream des commentaires d'un post spécifique
 final commentsProvider =
 StreamProvider.family<List<CommentModel>, String>((ref, postId) {
+  final authState = ref.watch(authStateProvider);
+  if (authState.valueOrNull == null) return Stream.value([]);
   return ref.watch(forumServiceProvider).watchComments(postId);
 });
 

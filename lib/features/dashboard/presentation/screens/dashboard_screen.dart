@@ -3,6 +3,7 @@
 // Écran 7 — Dashboard principal avec Bottom Navigation
 // ============================================================
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -107,7 +108,7 @@ class _HomeTab extends ConsumerWidget {
                                   style: TextStyle(
                                       color: Colors.white70, fontSize: 12)),
                               Text(
-                                user?.fullName ?? 'Utilisateur',
+                                user?.fullName ?? FirebaseAuth.instance.currentUser?.displayName ?? 'Utilisateur',
                                 style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 22,
