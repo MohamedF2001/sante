@@ -3,8 +3,12 @@
 // Écran 5 — Inscription
 // ============================================================
 
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_routes.dart';
 import '../providers/auth_provider.dart';
@@ -25,6 +29,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _enfantCtrl  = TextEditingController();
   bool _passVisible  = false;
 
+  DateTime? _dateNaissanceEnfant;
+  String _genreEnfant = 'M';
+  String? _photoBase64Enfant;
+
   @override
   void dispose() {
     for (final c in [_prenomCtrl, _nomCtrl, _telCtrl, _emailCtrl, _passCtrl, _enfantCtrl]) {
@@ -42,7 +50,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       prenom: _prenomCtrl.text.trim(),
       telephone: _telCtrl.text.trim(),
       nomEnfant: _enfantCtrl.text.trim(),
+      dateNaissanceEnfant: _dateNaissanceEnfant,
+      genreEnfant: _genreEnfant,
+      photoBase64Enfant: _photoBase64Enfant,
     );
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+    if (picked != null) {
+      final bytes = await File(picked.path).readAsBytes();
+      setState(() {
+        _photoBase64Enfant = base64Encode(bytes);
+      });
+    }
   }
 
   @override
@@ -198,6 +220,92 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         hint: 'Ibrahim',
                         icon: Icons.child_care,
                       ),
+                      const SizedBox(height: 16),
+
+                      _label('GENRE DE L\'ENFANT'),
+                      Row(
+                        children: [
+                          Radio<String>(
+                            value: 'M',
+                            groupValue: _genreEnfant,
+                            onChanged: (v) => setState(() => _genreEnfant = v!),
+                          ),
+                          const Text('Garçon'),
+                          const SizedBox(width: 20),
+                          Radio<String>(
+                            value: 'F',
+                            groupValue: _genreEnfant,
+                            onChanged: (v) => setState(() => _genreEnfant = v!),
+                          ),
+                          const Text('Fille'),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      _label('DATE DE NAISSANCE DE L\'ENFANT'),
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime.now(),
+                          );
+                          if (picked != null) {
+                            setState(() => _dateNaissanceEnfant = picked);
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: AppColors.border),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.calendar_today, size: 18, color: AppColors.textLight),
+                              const SizedBox(width: 10),
+                              Text(
+                                _dateNaissanceEnfant == null
+                                    ? 'Choisir une date'
+                                    : DateFormat('dd/MM/yyyy').format(_dateNaissanceEnfant!),
+                                style: TextStyle(
+                                  color: _dateNaissanceEnfant == null ? AppColors.textLight : AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      _label('PHOTO DE L\'ENFANT'),
+                      const SizedBox(height: 6),
+                      Center(
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: AppColors.background,
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(color: AppColors.border),
+                              image: _photoBase64Enfant != null
+                                  ? DecorationImage(
+                                      image: MemoryImage(base64Decode(_photoBase64Enfant!)),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                            ),
+                            child: _photoBase64Enfant == null
+                                ? const Icon(Icons.add_a_photo, color: AppColors.textLight)
+                                : null,
+                          ),
+                        ),
+                      ),
+
                       const SizedBox(height: 32),
 
                       // Bouton

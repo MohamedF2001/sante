@@ -16,13 +16,13 @@ final carnetServiceProvider = Provider<CarnetService>((_) => CarnetService());
 
 // Provider du userId courant
 final _currentUidProvider = Provider<String?>((ref) {
-  return FirebaseAuth.instance.currentUser?.uid;
+  return ref.watch(authStateProvider).valueOrNull?.uid;
 });
 
 // Stream des vaccins (temps réel)
 final vaccinsProvider = StreamProvider<List<VaccinModel>>((ref) {
   final uid = ref.watch(_currentUidProvider);
-  if (uid == null) return const Stream.empty();
+  if (uid == null) return Stream.value([]);
   return ref.watch(carnetServiceProvider).watchVaccins(uid);
 });
 
@@ -43,7 +43,7 @@ final vaccinsAVenirProvider = Provider<List<VaccinModel>>((ref) {
 // Stream des scans (temps réel)
 final scansProvider = StreamProvider<List<ScanModel>>((ref) {
   final uid = ref.watch(_currentUidProvider);
-  if (uid == null) return const Stream.empty();
+  if (uid == null) return Stream.value([]);
   return ref.watch(carnetServiceProvider).watchScans(uid);
 });
 
@@ -53,7 +53,7 @@ final mesuresProvider = StreamProvider<List<MesureModel>>((ref) {
   final user = ref.watch(userProfileProvider).valueOrNull;
   final enfantId = user?.activeEnfant?.id;
 
-  if (uid == null || enfantId == null) return const Stream.empty();
+  if (uid == null || enfantId == null) return Stream.value([]);
   return ref.watch(carnetServiceProvider).watchMesures(uid, enfantId);
 });
 
@@ -84,11 +84,12 @@ class CarnetNotifier extends StateNotifier<AsyncValue<void>> {
   }
 
   Future<void> uploadScan(File imageFile, {String? titre}) async {
-    if (_uid == null) return;
+    final uid = _uid;
+    if (uid == null) return;
     state = const AsyncLoading();
     try {
       await _service.saveScan(
-          userId: _uid!, imageFile: imageFile, titre: titre);
+          userId: uid, imageFile: imageFile, titre: titre);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

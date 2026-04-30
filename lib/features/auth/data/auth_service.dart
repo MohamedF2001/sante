@@ -23,6 +23,9 @@ class AuthService {
     required String prenom,
     required String telephone,
     required String nomEnfant,
+    DateTime? dateNaissanceEnfant,
+    String genreEnfant = 'M',
+    String? photoBase64Enfant,
   }) async {
     try {
       final cred = await _auth.createUserWithEmailAndPassword(
@@ -32,8 +35,9 @@ class AuthService {
       final premierEnfant = EnfantModel(
         id: const Uuid().v4(),
         nom: nomEnfant,
-        genre: 'M',
-        dateNaissance: DateTime.now(),
+        genre: genreEnfant,
+        dateNaissance: dateNaissanceEnfant,
+        photoUrl: photoBase64Enfant,
       );
 
       final user = UserModel(
@@ -62,8 +66,16 @@ class AuthService {
     String? email,
     String? telephone,
     String? password,
+    String? nomEnfant,
+    DateTime? dateNaissanceEnfant,
+    String? genreEnfant,
+    String? photoBase64Enfant,
   }) async {
     try {
+      final doc = await _db.collection('users').doc(uid).get();
+      if (!doc.exists) return;
+      final userModel = UserModel.fromFirestore(doc.data()!, uid);
+
       final updates = <String, dynamic>{};
       if (nom != null) updates['nom'] = nom;
       if (prenom != null) updates['prenom'] = prenom;
@@ -75,6 +87,29 @@ class AuthService {
 
       if (password != null && password.isNotEmpty) {
         await _auth.currentUser?.updatePassword(password);
+      }
+
+      // Mettre à jour l'enfant actif si des infos sont fournies
+      if (nomEnfant != null || dateNaissanceEnfant != null || genreEnfant != null || photoBase64Enfant != null) {
+        final activeId = userModel.activeEnfantId;
+        final nouveauxEnfants = userModel.enfants.map((e) {
+          if (e.id == activeId) {
+            return EnfantModel(
+              id: e.id,
+              nom: nomEnfant ?? e.nom,
+              dateNaissance: dateNaissanceEnfant ?? e.dateNaissance,
+              genre: genreEnfant ?? e.genre,
+              photoUrl: photoBase64Enfant ?? e.photoUrl,
+            );
+          }
+          return e;
+        }).toList();
+
+        updates['enfants'] = nouveauxEnfants.map((e) {
+          final map = e.toMap();
+          map['id'] = e.id;
+          return map;
+        }).toList();
       }
 
       if (updates.isNotEmpty) {
